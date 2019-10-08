@@ -24,6 +24,7 @@
 
 #include <array>
 #include <fstream>
+//#include <functions.h>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -202,9 +203,69 @@ void multiplayer() {
   record << "\n";
 }
 
-// int track(int life[]) {
-// return winner;
-//}
+int track(int style, int life[]) {
+  // int life[]=l[];
+  int chan_1, chang, newlife, chan[20], winner, replay = 0;
+  do {
+    for (int c = 0; c < num_players; c++) { // can i merge these 2 for loops
+      cin >> chan_1;                        // can these 2 lines be merged...
+      chan[c] = chan_1;
+    }
+    for (int l = 0; l < num_players; l++) {
+      newlife = life[l]; //...then i can probably merge these.
+      chang = chan[l];
+      life[l] = newlife + chang;
+    }
+    cout.width(4);
+    if (life[0] < 1) {
+      cout << left << "L";
+      record << setw(4) << left << "L";
+    } else {
+      cout << left << life[0];
+      record << setw(4) << left << life[0];
+    }
+    cout << " | ";
+    record << " | ";
+    cout.width(4);
+    if (life[1] < 1) {
+      cout << left << "L";
+      record << setw(4) << left << "L";
+    } else {
+      cout << right << life[1];
+      record << setw(4) << left << life[1];
+    }
+    for (int p = 2; p < num_players; p++) {
+      cout << " | ";
+      record << " | ";
+      cout.width(4);
+      if (life[p] < 1) {
+        cout << left << "L";
+        record << setw(4) << left << "L";
+      } else {
+        cout << left << life[p];
+        record << setw(4) << left << life[p];
+      }
+    }
+    cout << "\n";
+    record << "\n";
+    for (int w = 0; w < num_players; w++) {
+      if (life[w] > 0) {
+        replay++;
+        winner = w;
+      }
+    }
+  } while (replay > 1 && cin);
+  cout << "end track\n";
+  if (style == '2') { // changed from = to ==
+    cout << "Winner is Team " << winner + 1 << ".\n";
+    record << "Winner is Team " << winner + 1 << ".\n";
+  } else {
+    cout << "Winner is " << players[winner][0] << ".\n";
+    record << "Winner is " << players[winner][0] << ".\n";
+  }
+
+  return winner;
+}
 /**
  * This records the initials of the players.
  *
@@ -258,7 +319,7 @@ int main() {
   using namespace std;
   char letter, style, playercheck, stylecheck;
   ofstream record;
-  int life[20];                       // chan[20]
+  int life[20], chan[20];             // chan[20]
   int num_players = 2, gamecount = 0; // removed unused variables
   cout << "This program will keep track of life totals in a game of Magic.\n";
   cout << "The program can do 1v1, 2 headed giant, and 4 player commander.\n";
@@ -275,113 +336,50 @@ int main() {
     exit(1);
   }
   do {
-    do {
-      if (gamecount == 0) {
+    // do {
+    if (gamecount == 0) {
+      cout << "How many players?(up to 4)\n";
+      cin >> num_players;
+      new_line();
+      getplayers(players, num_players);
+    } else {
+      cout << "Same players (Y or N)?\n";
+      cin >> playercheck;
+      if (toupper(playercheck) == 'N') {
         cout << "How many players?(up to 4)\n";
         cin >> num_players;
         new_line();
         getplayers(players, num_players);
-      } else {
-        cout << "Same players (Y or N)?\n";
-        cin >> playercheck;
-        if (toupper(playercheck) == 'N') {
-          cout << "How many players?(up to 4)\n";
-          cin >> num_players;
-          new_line();
-          getplayers(players, num_players);
-        }
       }
-
-      if (gamecount == 0) {
+    }
+    if (gamecount == 0) {
+      cout << "What play style is this (enter the corresponding number)?\n";
+      cout << "1) 1v1   2) 2 headed giant 3) Commander\n";
+      cin >> style;
+      new_line();
+    } else {
+      cout << "Same style (Y or N)?\n";
+      cin >> stylecheck;
+      if (toupper(stylecheck) == 'N') {
         cout << "What play style is this (enter the corresponding number)?\n";
         cout << "1) 1v1   2) 2 headed giant 3) Commander\n";
         cin >> style;
         new_line();
-      } else {
-        cout << "Same style (Y or N)?\n";
-        cin >> stylecheck;
-        if (toupper(stylecheck) == 'N') {
-          cout << "What play style is this (enter the corresponding number)?\n";
-          cout << "1) 1v1   2) 2 headed giant 3) Commander\n";
-          cin >> style;
-          new_line();
-        }
       }
-
-      // int winner, replay = 0;
-      // see if possible to skip a player so that number of inputs can go down
-      cout << "Start Game\n";
-
-      setlife(style, num_players, life);
-      if (style == '2') { // changed from = to ==
-        twoheaded();
-      } else {
-        multiplayer();
-      }
-      row1(life);
-      //      int winner = track(life);
-      int chan_1, chang, newlife, chan[20], winner, replay = 0;
-      do {
-        for (int c = 0; c < num_players; c++) { // can i merge these 2 for loops
-          cin >> chan_1; // can these 2 lines be merged...
-          chan[c] = chan_1;
-        }
-        for (int l = 0; l < num_players; l++) {
-          newlife = life[l]; //...then i can probably merge these.
-          chang = chan[l];
-          life[l] = newlife + chang;
-        }
-        cout.width(4);
-        if (life[0] < 1) {
-          cout << left << "L";
-          record << setw(4) << left << "L";
-        } else {
-          cout << left << life[0];
-          record << setw(4) << left << life[0];
-        }
-        cout << " | ";
-        record << " | ";
-        cout.width(4);
-        if (life[1] < 1) {
-          cout << left << "L";
-          record << setw(4) << left << "L";
-        } else {
-          cout << right << life[1];
-          record << setw(4) << left << life[1];
-        }
-        for (int p = 2; p < num_players; p++) {
-          cout << " | ";
-          record << " | ";
-          cout.width(4);
-          if (life[p] < 1) {
-            cout << left << "L";
-            record << setw(4) << left << "L";
-          } else {
-            cout << left << life[p];
-            record << setw(4) << left << life[p];
-          }
-        }
-        cout << "\n";
-        record << "\n";
-        for (int w = 0; w < num_players; w++) {
-          if (life[w] > 0) {
-            replay++;
-            winner = w;
-          }
-        }
-      } while (replay > 1 && cin);
-      cout << "end track\n";
-      if (style == '2') { // changed from = to ==
-        cout << "Winner is Team " << winner + 1 << ".\n";
-        record << "Winner is Team " << winner + 1 << ".\n";
-      } else {
-        cout << "Winner is " << players[winner][0] << ".\n";
-        record << "Winner is " << players[winner][0] << ".\n";
-      }
-    } while (gamecount > 0 && cin); // added && cin for close on testing
+    }
+    // int winner, replay = 0;
+    cout << "Start Game\n";
+    setlife(style, num_players, life);
+    if (style == '2') { // changed from = to ==
+      twoheaded();
+    } else {
+      multiplayer();
+    }
+    row1(life);
+    int done = track(style, life);
+    // } while (done = > 0 && cin); // added && cin for close on testing
     new_line();
     cout << "\nAnother game (Y or N)?\n";
-    gamecount++;
     cin >> letter;
 
   } while (toupper(letter) == 'Y');
